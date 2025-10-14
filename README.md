@@ -111,16 +111,16 @@ button.ghost {
 
   <div class="controls">
     <select id="prefix">
-  <option value="LR">LR</option>
-  <option value="ML">ML</option>
-  <option value="SY">SY</option>
-  <option value="CM">CM</option>
-  <option value="NM">NM</option>
+      <option value="LR">LR</option>
+      <option value="ML">ML</option>
+      <option value="SY">SY</option>
+      <option value="CM">CM</option>
+      <option value="NM">NM</option>
     </select>
-    <select id="padChar">
-      <option value="">(none)</option>
-      <option value="-">-</option>
-    </select>
+
+    <input id="dateShift" type="date" placeholder="Date of Shift">
+    <input id="grade" type="text" placeholder="Grade">
+    <input id="home" type="text" placeholder="Home">
     <input id="quantity" type="number" min="1" max="50" value="1">
     <button id="genBtn">Generate</button>
     <button id="copyBtn" class="ghost">Copy</button>
@@ -142,7 +142,7 @@ button.ghost {
    Supabase Setup
 ================================ */
 const supabaseUrl = 'https://regoucscslemhbvurekt.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlZ291Y3Njc2xlbWhidnVyZWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODcxNjYsImV4cCI6MjA3NTk2MzE2Nn0.TKPxKfj70S-BarDNuWrpnmLMEl55XABwhIq-DvBxvAA'; // ← replace this
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlZ291Y3Njc2xlbWhidnVyZWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODcxNjYsImV4cCI6MjA3NTk2MzE2Nn0.TKPxKfj70S-BarDNuWrpnmLMEl55XABwhIq-DvBxvAA';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 /* ================================
@@ -161,13 +161,15 @@ function nextVal(){ const val=((a*c)+b)%M; c=(c+1)%M; used++; return val; }
    DOM Elements
 ================================ */
 const prefixEl=document.getElementById('prefix');
-const padEl=document.getElementById('padChar');
 const qtyEl=document.getElementById('quantity');
 const genBtn=document.getElementById('genBtn');
 const copyBtn=document.getElementById('copyBtn');
 const codebox=document.getElementById('codebox');
 const historyEl=document.getElementById('history');
 const exportBtn=document.getElementById('exportBtn');
+const dateShiftEl=document.getElementById('dateShift');
+const gradeEl=document.getElementById('grade');
+const homeEl=document.getElementById('home');
 
 let lastBatch=[];
 
@@ -199,7 +201,12 @@ function renderHistory(rows){
     const div=document.createElement('div');
     div.className='history-entry';
     const t=new Date(row.created_at).toLocaleString();
-    div.innerHTML=`<div>${row.full_code}</div><div style="color:var(--muted);font-size:12px">${t}</div>`;
+    div.innerHTML=`
+      <div>
+        <strong>${row.full_code}</strong><br>
+        <small>Date of Shift: ${row.date_of_shift||'-'} | Grade: ${row.grade||'-'} | Home: ${row.home||'-'}</small>
+      </div>
+      <div style="color:var(--muted);font-size:12px">${t}</div>`;
     historyEl.appendChild(div);
   });
 }
@@ -221,6 +228,9 @@ async function exportToExcel(){
   const rows = data.map(r => ({
     Full_Code: r.full_code,
     Digits: r.digits,
+    Date_of_Shift: r.date_of_shift || '',
+    Grade: r.grade || '',
+    Home: r.home || '',
     Timestamp: new Date(r.created_at).toLocaleString()
   }));
   const ws = XLSX.utils.json_to_sheet(rows);
@@ -234,16 +244,22 @@ async function exportToExcel(){
 ================================ */
 genBtn.addEventListener('click', async()=>{
   const prefix=prefixEl.value||'';
-  const pad=padEl.value||'';
   let qty=parseInt(qtyEl.value)||1;
   if(qty>50)qty=50;
+
+  const dateOfShift=dateShiftEl.value||'';
+  const grade=gradeEl.value||'';
+  const home=homeEl.value||'';
 
   const newCodes=[];
   for(let i=0;i<qty;i++){
     const v=fmt6(nextVal());
     newCodes.push({
-      full_code: prefix + pad + v,
-      digits: v
+      full_code: prefix + v,
+      digits: v,
+      date_of_shift: dateOfShift,
+      grade: grade,
+      home: home
     });
   }
   lastBatch=newCodes;
@@ -280,4 +296,3 @@ loadHistory();
 </script>
 </body>
 </html>
-
