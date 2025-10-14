@@ -126,7 +126,7 @@ button.ghost {
    JSONBin Configuration
 ================================ */
 const BIN_ID = "68ee20ea43b1c97be9671f6b"; // e.g. 66f11234567890abcd1234ef
-const API_KEY = "68ee214b43b1c97be967204b";
+const API_KEY = "$2a$10$EpbyiFMiHRZm8TwdhsZwHe0et11kU4g0YupLd5ehZTYWxFnTlsxd.";
 const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
 /* ================================
