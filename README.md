@@ -264,25 +264,48 @@ async function exportToExcel(){
 /* ================================
    UI Handlers
 ================================ */
-genBtn.addEventListener('click', async()=>{
-  const prefix=prefixEl.value||'';
-  let qty=parseInt(qtyEl.value)||1;
-  if(qty>50)qty=50;
+genBtn.addEventListener('click', async () => {
+  const prefix = prefixEl.value || '';
+  let qty = parseInt(qtyEl.value) || 1;
+  if (qty > 50) qty = 50;
 
-  const dateOfShift=dateShiftEl.value||'';
-  const grade=gradeEl.value||'';
-  const home=homeEl.value||'';
+  const dateOfShift = dateShiftEl.value || '';
+  const grade = gradeEl.value || '';
+  const home = homeEl.value || '';
 
-  const newCodes=[];
-  for(let i=0;i<qty;i++){
-    const v=fmt6(nextVal());
+  // Map of grade abbreviations
+  const gradeAbbr = {
+    "Cook": "CO",
+    "HCA - Day": "HD",
+    "HCA - Night": "HN",
+    "RGN - Day": "RD",
+    "RGN - Night": "RN",
+    "SHCA - Day": "SD",
+    "SHCA - Night": "SN"
+  };
+
+  const gradeSuffix = gradeAbbr[grade] || '';
+
+  const newCodes = [];
+  for (let i = 0; i < qty; i++) {
+    const v = fmt6(nextVal());
+    const fullCode = prefix + v + gradeSuffix;
     newCodes.push({
-      full_code: prefix + v,
+      full_code: fullCode,
       digits: v,
       date_of_shift: dateOfShift,
       grade: grade,
       home: home
     });
+  }
+
+  lastBatch = newCodes;
+  codebox.textContent =
+    qty === 1 ? newCodes[0].full_code : `${qty} codes generated`;
+
+  await insertCodes(newCodes);
+  await loadHistory();
+});
   }
   lastBatch=newCodes;
   codebox.textContent = qty===1 ? newCodes[0].full_code : `${qty} codes generated`;
