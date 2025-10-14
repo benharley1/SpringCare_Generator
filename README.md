@@ -14,36 +14,120 @@
   --accent: #7c5cff;
   --muted: #9aa4b2;
 }
+
 body {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
-  background: linear-gradient(180deg,#061021 0%, #071428 100%);
+  background: linear-gradient(180deg, #061021 0%, #071428 100%);
   color: #e6eef6;
-  display: flex; align-items: center; justify-content: center;
-  min-height: 100vh; margin: 0; padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
 }
+
 .card {
-  width: 100%; max-width: 640px; padding: 20px;
+  width: 100%;
+  max-width: 640px;
+  padding: 20px;
   border-radius: 14px;
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
   box-shadow: 0 8px 30px rgba(2,6,23,0.6);
 }
-.controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-.controls input, .controls select, .controls button {
-  flex: 1 1 45%; min-width: 100px;
-  border-radius: 10px; padding: 8px; font-size: 14px;
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
 }
-.controls select {
-  max-width: 160px;
+
+/* --- Equalize input/select appearance --- */
+.controls select,
+.controls input[type="number"] {
+  flex: 1 1 45%;
+  min-width: 130px;
+  max-width: 180px;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.04);
+  color: #e6eef6;
+  height: 40px;
+  box-sizing: border-box;
 }
+
+.controls select:focus,
+.controls input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.3);
+}
+
+/* --- Buttons (unchanged style for Generate, Copy, Export) --- */
 button {
-  background: linear-gradient(180deg,var(--accent),#6046e6);
-  color: white; border: 0; font-weight: 600; cursor: pointer;
+  background: linear-gradient(180deg, var(--accent), #6046e6);
+  color: white;
+  border: 0;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 10px 0;
+  border-radius: 10px;
+  font-size: 14px;
+  height: 40px;
+  transition: transform 0.1s ease, opacity 0.2s;
 }
-button.ghost { background: transparent; border: 1px solid rgba(255,255,255,0.06); color: var(--muted); }
-.display { margin-top: 20px; display: flex; justify-content: center; }
-.codebox { background: #051025; border-radius: 10px; padding: 16px; font-size: 22px; text-align: center; width: 100%; }
-.history { margin-top: 16px; max-height: 250px; overflow-y: auto; font-family: monospace; font-size: 14px; }
-.history-entry { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.04); padding: 6px 0; }
+
+button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+button.ghost {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: var(--muted);
+}
+
+/* --- Export button footer layout --- */
+.footer button {
+  width: 45%;
+  min-width: 120px;
+  height: 40px;
+}
+
+.display {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.codebox {
+  background: #051025;
+  border-radius: 10px;
+  padding: 16px;
+  font-size: 22px;
+  text-align: center;
+  width: 100%;
+}
+
+.history {
+  margin-top: 16px;
+  max-height: 250px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.history-entry {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  padding: 6px 0;
+}
+
 </style>
 </head>
 
