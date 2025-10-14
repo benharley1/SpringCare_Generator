@@ -136,11 +136,9 @@ button.ghost {
 /* ================================
    Supabase Setup
 ================================ */
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = 'https://regoucscslemhbvurekt.supabase.co'
-const supabaseKey = process.env.SUPABASE_KEY
-const supabase = createClient(supabaseUrl, supabaseKey)
+const supabaseUrl = 'https://regoucscslemhbvurekt.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlZ291Y3Njc2xlbWhidnVyZWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODcxNjYsImV4cCI6MjA3NTk2MzE2Nn0.TKPxKfj70S-BarDNuWrpnmLMEl55XABwhIq-DvBxvAA'; // from Supabase > Project Settings > API
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 /* ================================
    Generator Functions
@@ -213,7 +211,7 @@ async function exportToExcel(){
   const { data, error } = await supabase.from('codes').select('*').order('timestamp',{ascending:false});
   if(error){ alert("Failed to export."); return; }
   const rows = data.map(r => ({
-    Full_Code: r.full,
+    Full_Code: r.full_code,
     Digits: r.digits,
     Timestamp: new Date(r.timestamp).toLocaleString()
   }));
