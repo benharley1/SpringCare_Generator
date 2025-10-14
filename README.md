@@ -7,6 +7,9 @@
 <!-- Supabase JS SDK -->
 <script src="https://unpkg.com/@supabase/supabase-js@2.46.1/dist/umd/supabase.js"></script>
 
+<!-- SheetJS for Excel Export -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 <style>
 :root {
   --bg: #0f1724;
@@ -129,19 +132,16 @@ button.ghost {
   <div class="history" id="history">Loading shared history...</div>
 </div>
 
-<!-- SheetJS for Excel Export -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
 <script>
 /* ================================
    Supabase Setup
 ================================ */
 const supabaseUrl = 'https://regoucscslemhbvurekt.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlZ291Y3Njc2xlbWhidnVyZWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODcxNjYsImV4cCI6MjA3NTk2MzE2Nn0.TKPxKfj70S-BarDNuWrpnmLMEl55XABwhIq-DvBxvAA'; // from Supabase > Project Settings > API
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlZ291Y3Njc2xlbWhidnVyZWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODcxNjYsImV4cCI6MjA3NTk2MzE2Nn0.TKPxKfj70S-BarDNuWrpnmLMEl55XABwhIq-DvBxvAA'; // ← replace this
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 /* ================================
-   Generator Functions
+   Generator Logic
 ================================ */
 const M = 1000000;
 function randInt(max){ return Math.floor(Math.random()*max); }
@@ -173,7 +173,7 @@ async function loadHistory(){
   const { data, error } = await supabase
     .from('codes')
     .select('*')
-    .order('timestamp', { ascending: false })
+    .order('created_at', { ascending: false })
     .limit(500);
   if (error) {
     historyEl.textContent = "Error loading history.";
@@ -193,8 +193,8 @@ function renderHistory(rows){
   rows.forEach(row => {
     const div=document.createElement('div');
     div.className='history-entry';
-    const t=new Date(row.timestamp).toLocaleString();
-    div.innerHTML=`<div>${row.full}</div><div style="color:var(--muted);font-size:12px">${t}</div>`;
+    const t=new Date(row.created_at).toLocaleString();
+    div.innerHTML=`<div>${row.full_code}</div><div style="color:var(--muted);font-size:12px">${t}</div>`;
     historyEl.appendChild(div);
   });
 }
@@ -208,12 +208,15 @@ async function insertCodes(codes){
    Excel Export
 ================================ */
 async function exportToExcel(){
-  const { data, error } = await supabase.from('codes').select('*').order('timestamp',{ascending:false});
+  const { data, error } = await supabase
+    .from('codes')
+    .select('*')
+    .order('created_at',{ascending:false});
   if(error){ alert("Failed to export."); return; }
   const rows = data.map(r => ({
     Full_Code: r.full_code,
     Digits: r.digits,
-    Timestamp: new Date(r.timestamp).toLocaleString()
+    Timestamp: new Date(r.created_at).toLocaleString()
   }));
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
@@ -234,12 +237,12 @@ genBtn.addEventListener('click', async()=>{
   for(let i=0;i<qty;i++){
     const v=fmt6(nextVal());
     newCodes.push({
-      full: prefix + pad + v,
+      full_code: prefix + pad + v,
       digits: v
     });
   }
   lastBatch=newCodes;
-  codebox.textContent = qty===1 ? newCodes[0].full : `${qty} codes generated`;
+  codebox.textContent = qty===1 ? newCodes[0].full_code : `${qty} codes generated`;
 
   await insertCodes(newCodes);
   await loadHistory();
@@ -247,7 +250,7 @@ genBtn.addEventListener('click', async()=>{
 
 copyBtn.addEventListener('click', async()=>{
   if(!lastBatch.length) return alert('Generate a code first.');
-  const text=lastBatch.map(c=>c.full).join('\n');
+  const text=lastBatch.map(c=>c.full_code).join('\n');
   await navigator.clipboard.writeText(text);
   copyBtn.textContent='Copied!';
   setTimeout(()=>copyBtn.textContent='Copy',1200);
@@ -260,7 +263,7 @@ exportBtn.addEventListener('click', exportToExcel);
 ================================ */
 supabase
   .channel('codes-changes')
-  .on('postgres_changes', { event: '*', schema: 'public', table: 'codes' }, payload => {
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'codes' }, () => {
     loadHistory();
   })
   .subscribe();
@@ -272,3 +275,4 @@ loadHistory();
 </script>
 </body>
 </html>
+
