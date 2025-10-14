@@ -29,8 +29,11 @@ body {
 }
 .controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 .controls input, .controls select, .controls button {
-  flex: 1 1 45%; min-width: 120px;
-  border-radius: 10px; padding: 12px; font-size: 16px;
+  flex: 1 1 45%; min-width: 100px;
+  border-radius: 10px; padding: 8px; font-size: 14px;
+}
+.controls select {
+  max-width: 160px;
 }
 button {
   background: linear-gradient(180deg,var(--accent),#6046e6);
@@ -55,6 +58,10 @@ button.ghost { background: transparent; border: 1px solid rgba(255,255,255,0.06)
       <option value="SY">SY</option><option value="CM">CM</option><option value="NM">NM</option>
     </select>
 
+    <!-- Quantity moved before Grade -->
+    <input id="quantity" type="number" min="1" max="50" value="1">
+
+    <!-- Grade moved after Quantity -->
     <select id="grade" required>
       <option value="">Select Grade *</option>
       <option>Cook</option><option>HCA - Day</option><option>HCA - Night</option>
@@ -74,7 +81,6 @@ button.ghost { background: transparent; border: 1px solid rgba(255,255,255,0.06)
       <option>WH</option><option>WK</option><option>WWH</option><option>YG</option>
     </select>
 
-    <input id="quantity" type="number" min="1" max="50" value="1">
     <button id="genBtn">Generate</button>
     <button id="copyBtn" class="ghost">Copy</button>
   </div>
