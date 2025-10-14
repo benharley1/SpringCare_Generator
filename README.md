@@ -90,99 +90,133 @@ button.ghost { background: transparent; border: 1px solid rgba(255,255,255,0.06)
 
 <script>
 /* Supabase Setup */
-const supabaseUrl='https://regoucscslemhbvurekt.supabase.co';
-const supabaseKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlZ291Y3Njc2xlbWhidnVyZWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODcxNjYsImV4cCI6MjA3NTk2MzE2Nn0.TKPxKfj70S-BarDNuWrpnmLMEl55XABwhIq-DvBxvAA';
-const supabase=window.supabase.createClient(supabaseUrl,supabaseKey);
+const supabaseUrl = 'https://regoucscslemhbvurekt.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlZ291Y3Njc2xlbWhidnVyZWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODcxNjYsImV4cCI6MjA3NTk2MzE2Nn0.TKPxKfj70S-BarDNuWrpnmLMEl55XABwhIq-DvBxvAA';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 /* Generator Logic */
-const M=1000000;
-function randInt(max){return Math.floor(Math.random()*max);}
-function gcd(a,b){while(b){[a,b]=[b,a%b];}return a;}
-function chooseA(){while(true){const a=1+randInt(M-1);if(gcd(a,M)===1)return a;}}
-function fmt6(n){return n.toString().padStart(6,"0");}
-let a=chooseA(),b=randInt(M),c=randInt(M);
-function nextVal(){const val=((a*c)+b)%M;c=(c+1)%M;return val;}
+const M = 1000000;
+function randInt(max) { return Math.floor(Math.random() * max); }
+function gcd(a, b) { while (b) { [a, b] = [b, a % b]; } return a; }
+function chooseA() { while (true) { const a = 1 + randInt(M - 1); if (gcd(a, M) === 1) return a; } }
+function fmt6(n) { return n.toString().padStart(6, "0"); }
+let a = chooseA(), b = randInt(M), c = randInt(M);
+function nextVal() { const val = ((a * c) + b) % M; c = (c + 1) % M; return val; }
 
 /* Elements */
-const prefixEl=document.getElementById('prefix');
-const gradeEl=document.getElementById('grade');
-const homeEl=document.getElementById('home');
-const qtyEl=document.getElementById('quantity');
-const codebox=document.getElementById('codebox');
-const historyEl=document.getElementById('history');
-const copyBtn=document.getElementById('copyBtn');
-const exportBtn=document.getElementById('exportBtn');
-let lastBatch=[];
+const prefixEl = document.getElementById('prefix');
+const gradeEl = document.getElementById('grade');
+const homeEl = document.getElementById('home');
+const qtyEl = document.getElementById('quantity');
+const codebox = document.getElementById('codebox');
+const historyEl = document.getElementById('history');
+const copyBtn = document.getElementById('copyBtn');
+const exportBtn = document.getElementById('exportBtn');
+let lastBatch = [];
+
+/* Grade Abbreviations */
+const gradeAbbr = {
+  "Cook": "CO",
+  "HCA - Day": "HD",
+  "HCA - Night": "HN",
+  "RGN - Day": "RD",
+  "RGN - Night": "RN",
+  "SHCA - Day": "SD",
+  "SHCA - Night": "SN"
+};
 
 /* Load History */
-async function loadHistory(){
-  const {data,error}=await supabase.from('codes').select('*').order('created_at',{ascending:false}).limit(500);
-  if(error){historyEl.textContent="Error loading history.";return;}
-  historyEl.innerHTML='';
-  if(!data.length){historyEl.textContent='No codes yet.';return;}
-  data.forEach(r=>{
-    const div=document.createElement('div');
-    div.className='history-entry';
-    const t=new Date(r.created_at).toLocaleString();
-    div.innerHTML=`<div><strong>${r.full_code}</strong><br>
-      <small>Grade: ${r.grade||'-'} | Home: ${r.home||'-'}</small></div>
+async function loadHistory() {
+  const { data, error } = await supabase
+    .from('codes')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(500);
+  if (error) {
+    historyEl.textContent = "Error loading history.";
+    return;
+  }
+  historyEl.innerHTML = '';
+  if (!data.length) {
+    historyEl.textContent = 'No codes yet.';
+    return;
+  }
+  data.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'history-entry';
+    const t = new Date(r.created_at).toLocaleString();
+    div.innerHTML = `
+      <div>
+        <strong>${r.full_code}</strong><br>
+        <small>Grade: ${r.grade || '-'} | Home: ${r.home || '-'}</small>
+      </div>
       <div style="color:var(--muted);font-size:12px">${t}</div>`;
     historyEl.appendChild(div);
   });
 }
 
 /* Insert Codes */
-async function insertCodes(codes){await supabase.from('codes').insert(codes);}
+async function insertCodes(codes) {
+  await supabase.from('codes').insert(codes);
+}
 
 /* Generate */
-document.getElementById('genBtn').addEventListener('click',async()=>{
-  const prefix=prefixEl.value||'';
-  const grade=gradeEl.value.trim();
-  const home=homeEl.value.trim();
-  if(!grade || !home){
+document.getElementById('genBtn').addEventListener('click', async () => {
+  const prefix = prefixEl.value || '';
+  const grade = gradeEl.value.trim();
+  const home = homeEl.value.trim();
+  if (!grade || !home) {
     alert('Please select both Grade and Home before generating.');
     return;
   }
-  let qty=parseInt(qtyEl.value)||1;
-  if(qty>50)qty=50;
+  let qty = parseInt(qtyEl.value) || 1;
+  if (qty > 50) qty = 50;
 
-  const newCodes=[];
-  for(let i=0;i<qty;i++){
-    const v=fmt6(nextVal());
-    newCodes.push({full_code:prefix+v,grade,home});
+  const abbr = gradeAbbr[grade] || '';
+
+  const newCodes = [];
+  for (let i = 0; i < qty; i++) {
+    const v = fmt6(nextVal());
+    const fullCode = `${prefix}${v}${abbr}`;
+    newCodes.push({ full_code: fullCode, grade, home });
   }
-  lastBatch=newCodes;
-  codebox.textContent=qty===1?newCodes[0].full_code:`${qty} codes generated`;
+
+  lastBatch = newCodes;
+  codebox.textContent = qty === 1 ? newCodes[0].full_code : `${qty} codes generated`;
   await insertCodes(newCodes);
   await loadHistory();
 });
 
 /* Copy */
-copyBtn.addEventListener('click',async()=>{
-  if(!lastBatch.length)return alert('Generate a code first.');
-  await navigator.clipboard.writeText(lastBatch.map(c=>c.full_code).join('\n'));
-  copyBtn.textContent='Copied!';setTimeout(()=>copyBtn.textContent='Copy',1200);
+copyBtn.addEventListener('click', async () => {
+  if (!lastBatch.length) return alert('Generate a code first.');
+  await navigator.clipboard.writeText(lastBatch.map(c => c.full_code).join('\n'));
+  copyBtn.textContent = 'Copied!';
+  setTimeout(() => copyBtn.textContent = 'Copy', 1200);
 });
 
 /* Export */
-exportBtn.addEventListener('click',async()=>{
-  const {data,error}=await supabase.from('codes').select('*').order('created_at',{ascending:false});
-  if(error){alert("Failed to export.");return;}
-  const rows=data.map(r=>({
-    Full_Code:r.full_code,
-    Grade:r.grade||'',
-    Home:r.home||'',
-    Timestamp:new Date(r.created_at).toLocaleString()
+exportBtn.addEventListener('click', async () => {
+  const { data, error } = await supabase
+    .from('codes')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) { alert("Failed to export."); return; }
+  const rows = data.map(r => ({
+    Full_Code: r.full_code,
+    Grade: r.grade || '',
+    Home: r.home || '',
+    Timestamp: new Date(r.created_at).toLocaleString()
   }));
-  const ws=XLSX.utils.json_to_sheet(rows);
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Codes");
-  XLSX.writeFile(wb,"shared_codes.xlsx");
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Codes");
+  XLSX.writeFile(wb, "shared_codes.xlsx");
 });
 
 /* Live Updates */
 supabase.channel('codes-changes')
-  .on('postgres_changes',{event:'*',schema:'public',table:'codes'},loadHistory)
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'codes' }, loadHistory)
   .subscribe();
 
 /* Initial Load */
