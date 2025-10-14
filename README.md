@@ -119,8 +119,30 @@ button.ghost {
     </select>
 
     <input id="dateShift" type="date" placeholder="Date of Shift">
-    <input id="grade" type="text" placeholder="Grade">
-    <input id="home" type="text" placeholder="Home">
+
+    <select id="grade">
+      <option value="">Select Grade</option>
+      <option>Cook</option>
+      <option>HCA - Day</option>
+      <option>HCA - Night</option>
+      <option>RGN - Day</option>
+      <option>RGN - Night</option>
+      <option>SHCA - Day</option>
+      <option>SHCA - Night</option>
+    </select>
+
+    <select id="home">
+      <option value="">Select Home</option>
+      <option>AHE</option><option>ANLW</option><option>BC</option><option>BG</option>
+      <option>BH</option><option>BM</option><option>BMN</option><option>CRH</option>
+      <option>CV</option><option>DH</option><option>HC</option><option>HH</option>
+      <option>HM</option><option>KC</option><option>LP</option><option>MH</option>
+      <option>MV</option><option>NH</option><option>OG</option><option>PHB</option>
+      <option>PHP</option><option>RM</option><option>RWM</option><option>SL</option>
+      <option>SP</option><option>TC</option><option>TG</option><option>TL</option>
+      <option>WH</option><option>WK</option><option>WWH</option><option>YG</option>
+    </select>
+
     <input id="quantity" type="number" min="1" max="50" value="1">
     <button id="genBtn">Generate</button>
     <button id="copyBtn" class="ghost">Copy</button>
