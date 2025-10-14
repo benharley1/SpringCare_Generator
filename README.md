@@ -24,7 +24,7 @@ body {
   justify-content: center;
   min-height: 100vh;
   margin: 0;
-  padding: 20px;
+  padding: 16px;
 }
 
 .card {
@@ -32,10 +32,12 @@ body {
   max-width: 640px;
   padding: 20px;
   border-radius: 14px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
   box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+  box-sizing: border-box;
 }
 
+/* ---------- Controls ---------- */
 .controls {
   display: flex;
   flex-wrap: wrap;
@@ -43,19 +45,18 @@ body {
   justify-content: center;
 }
 
-/* --- Equalize input/select appearance --- */
 .controls select,
 .controls input[type="number"] {
   flex: 1 1 45%;
   min-width: 130px;
-  max-width: 180px;
+  max-width: 200px;
   border-radius: 10px;
   padding: 10px;
-  font-size: 14px;
-  border: 1px solid rgba(255,255,255,0.06);
-  background: rgba(255,255,255,0.04);
+  font-size: 15px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.05);
   color: #e6eef6;
-  height: 40px;
+  height: 44px;
   box-sizing: border-box;
 }
 
@@ -66,7 +67,7 @@ body {
   box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.3);
 }
 
-/* --- Buttons (unchanged style for Generate, Copy, Export) --- */
+/* ---------- Buttons ---------- */
 button {
   background: linear-gradient(180deg, var(--accent), #6046e6);
   color: white;
@@ -75,8 +76,8 @@ button {
   cursor: pointer;
   padding: 10px 0;
   border-radius: 10px;
-  font-size: 14px;
-  height: 40px;
+  font-size: 15px;
+  height: 44px;
   transition: transform 0.1s ease, opacity 0.2s;
 }
 
@@ -87,17 +88,18 @@ button:hover {
 
 button.ghost {
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
   color: var(--muted);
 }
 
-/* --- Export button footer layout --- */
+/* Footer export button */
 .footer button {
-  width: 45%;
-  min-width: 120px;
-  height: 40px;
+  width: 60%;
+  min-width: 140px;
+  height: 44px;
 }
 
+/* ---------- Display & History ---------- */
 .display {
   margin-top: 20px;
   display: flex;
@@ -107,18 +109,21 @@ button.ghost {
 .codebox {
   background: #051025;
   border-radius: 10px;
-  padding: 16px;
+  padding: 18px;
   font-size: 22px;
   text-align: center;
   width: 100%;
+  word-break: break-word;
 }
 
 .history {
   margin-top: 16px;
-  max-height: 250px;
+  max-height: 300px;
   overflow-y: auto;
   font-family: monospace;
   font-size: 14px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 8px;
 }
 
 .history-entry {
@@ -126,6 +131,47 @@ button.ghost {
   justify-content: space-between;
   border-bottom: 1px solid rgba(255,255,255,0.04);
   padding: 6px 0;
+}
+
+/* ---------- Mobile Optimization ---------- */
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .controls select,
+  .controls input[type="number"],
+  .controls button {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
+    font-size: 16px;
+  }
+
+  .footer button {
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  .codebox {
+    font-size: 20px;
+  }
+
+  .history {
+    max-height: 200px;
+  }
 }
 
 </style>
