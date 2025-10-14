@@ -125,9 +125,12 @@ button.ghost {
 /* ================================
    JSONBin Configuration
 ================================ */
-const BIN_ID = "68ee20ea43b1c97be9671f6b"; // e.g. 66f11234567890abcd1234ef
-const API_KEY = "$2a$10$EpbyiFMiHRZm8TwdhsZwHe0et11kU4g0YupLd5ehZTYWxFnTlsxd.";
-const BIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = 'https://regoucscslemhbvurekt.supabase.co'
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 /* ================================
    Code Generator Logic
