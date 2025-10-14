@@ -2,7 +2,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Shared 6-Digit Code Generator (Supabase)</title>
+<title>6-Digit Code Generator (Supabase)</title>
 
 <!-- Supabase JS SDK -->
 <script src="https://unpkg.com/@supabase/supabase-js@2.46.1/dist/umd/supabase.js"></script>
