@@ -2,7 +2,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Shared 6-Digit Code Generator</title>
+<title>Shared 6-Digit Code Generator (Supabase)</title>
+
+<!-- Supabase JS SDK -->
+<script src="https://unpkg.com/@supabase/supabase-js@2.46.1/dist/umd/supabase.js"></script>
 
 <style>
 :root {
@@ -89,6 +92,7 @@ button.ghost {
   padding-bottom: 6px;
   border-bottom: 1px solid rgba(255,255,255,0.04);
 }
+.footer { margin-top: 16px; display: flex; justify-content: center; }
 @media (max-width: 600px) {
   .controls { flex-direction: column; align-items: stretch; }
   button, input, select { width: 100%; font-size: 17px; }
@@ -100,7 +104,7 @@ button.ghost {
 <body>
 <div class="card">
   <h1>Shared 6-Digit Code Generator</h1>
-  <p class="lead">Generate unique codes — shared history updates live for everyone.</p>
+  <p class="lead">All users share one synced history (Supabase backend).</p>
 
   <div class="controls">
     <input id="prefix" type="text" placeholder="Prefix (e.g. INV-)" value="CODE-">
@@ -118,27 +122,31 @@ button.ghost {
     <div class="codebox" id="codebox">—</div>
   </div>
 
-  <div class="history" id="history">Loading history...</div>
+  <div class="footer">
+    <button id="exportBtn" class="ghost">Export to Excel</button>
+  </div>
+
+  <div class="history" id="history">Loading shared history...</div>
 </div>
+
+<!-- SheetJS for Excel Export -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <script>
 /* ================================
-   JSONBin Configuration
+   Supabase Setup
 ================================ */
-
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = 'https://regoucscslemhbvurekt.supabase.co'
-const supabaseKey = process.env.SUPABASE_KEY
-const supabase = createClient(supabaseUrl, supabaseKey)
+const SUPABASE_URL = "https://regoucscslemhbvurekt.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlZ291Y3Njc2xlbWhidnVyZWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODcxNjYsImV4cCI6MjA3NTk2MzE2Nn0.TKPxKfj70S-BarDNuWrpnmLMEl55XABwhIq-DvBxvAA";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ================================
-   Code Generator Logic
+   Generator Functions
 ================================ */
 const M = 1000000;
 function randInt(max){ return Math.floor(Math.random()*max); }
 function gcd(a,b){ while(b){[a,b]=[b,a%b];} return a; }
-function chooseA(){ while(true){ const a=1+randInt(M-1); if(gcd(a,M)===1) return a; } }
+function chooseA(){ while(true){ const a=1+randInt(M-1); if(gcd(a,M)===1)return a; } }
 function fmt6(n){ return n.toString().padStart(6,"0"); }
 
 let a=chooseA(), b=randInt(M), c=randInt(M), used=0;
@@ -154,71 +162,87 @@ const genBtn=document.getElementById('genBtn');
 const copyBtn=document.getElementById('copyBtn');
 const codebox=document.getElementById('codebox');
 const historyEl=document.getElementById('history');
+const exportBtn=document.getElementById('exportBtn');
+
 let lastBatch=[];
 
 /* ================================
-   JSONBin Functions
+   Supabase Functions
 ================================ */
-async function fetchHistory(){
-  const res=await fetch(BIN_URL,{headers:{'X-Master-Key':API_KEY}});
-  const data=await res.json();
-  return data.record.codes||[];
+async function loadHistory(){
+  const { data, error } = await supabase
+    .from('codes')
+    .select('*')
+    .order('timestamp', { ascending: false })
+    .limit(500);
+  if (error) {
+    historyEl.textContent = "Error loading history.";
+    console.error(error);
+    return [];
+  }
+  renderHistory(data);
+  return data;
 }
 
-async function saveHistory(codes){
-  await fetch(BIN_URL,{
-    method:'PUT',
-    headers:{
-      'Content-Type':'application/json',
-      'X-Master-Key':API_KEY
-    },
-    body:JSON.stringify({codes})
-  });
-}
-
-/* ================================
-   UI Functions
-================================ */
-function renderHistory(codes){
-  historyEl.innerHTML='';
-  codes.slice().reverse().forEach(c=>{
+function renderHistory(rows){
+  historyEl.innerHTML = '';
+  if (!rows.length) {
+    historyEl.textContent = 'No codes yet.';
+    return;
+  }
+  rows.forEach(row => {
     const div=document.createElement('div');
     div.className='history-entry';
-    div.innerHTML=`<div>${c.full}</div><div style="color:var(--muted);font-size:12px">${new Date(c.timestamp).toLocaleString()}</div>`;
+    const t=new Date(row.timestamp).toLocaleString();
+    div.innerHTML=`<div>${row.full}</div><div style="color:var(--muted);font-size:12px">${t}</div>`;
     historyEl.appendChild(div);
   });
 }
 
-async function updateHistory(){
-  try{
-    const codes=await fetchHistory();
-    renderHistory(codes);
-  }catch(e){
-    historyEl.textContent='Failed to load shared history.';
-  }
+async function insertCodes(codes){
+  const { error } = await supabase.from('codes').insert(codes);
+  if (error) console.error('Insert failed', error);
 }
 
 /* ================================
-   Main Handlers
+   Excel Export
+================================ */
+async function exportToExcel(){
+  const { data, error } = await supabase.from('codes').select('*').order('timestamp',{ascending:false});
+  if(error){ alert("Failed to export."); return; }
+  const rows = data.map(r => ({
+    Full_Code: r.full,
+    Digits: r.digits,
+    Timestamp: new Date(r.timestamp).toLocaleString()
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Codes");
+  XLSX.writeFile(wb, "shared_codes.xlsx");
+}
+
+/* ================================
+   UI Handlers
 ================================ */
 genBtn.addEventListener('click', async()=>{
   const prefix=prefixEl.value||'';
   const pad=padEl.value||'';
   let qty=parseInt(qtyEl.value)||1;
   if(qty>50)qty=50;
+
   const newCodes=[];
   for(let i=0;i<qty;i++){
     const v=fmt6(nextVal());
-    newCodes.push({full:prefix+pad+v, digits:v, timestamp:Date.now()});
+    newCodes.push({
+      full: prefix + pad + v,
+      digits: v
+    });
   }
   lastBatch=newCodes;
-  codebox.textContent=qty===1?newCodes[0].full:`${qty} codes generated`;
+  codebox.textContent = qty===1 ? newCodes[0].full : `${qty} codes generated`;
 
-  // Load current shared log
-  const current=await fetchHistory();
-  const updated=[...current,...newCodes].slice(-500);
-  await saveHistory(updated);
-  await updateHistory();
+  await insertCodes(newCodes);
+  await loadHistory();
 });
 
 copyBtn.addEventListener('click', async()=>{
@@ -229,11 +253,22 @@ copyBtn.addEventListener('click', async()=>{
   setTimeout(()=>copyBtn.textContent='Copy',1200);
 });
 
+exportBtn.addEventListener('click', exportToExcel);
+
 /* ================================
-   Initialize
+   Live Updates (Realtime)
 ================================ */
-updateHistory();
-setInterval(updateHistory, 10000); // auto-refresh every 10s
+supabase
+  .channel('codes-changes')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'codes' }, payload => {
+    loadHistory();
+  })
+  .subscribe();
+
+/* ================================
+   Initial Load
+================================ */
+loadHistory();
 </script>
 </body>
 </html>
