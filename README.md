@@ -106,8 +106,8 @@ button.ghost {
 
 <body>
 <div class="card">
-  <h1>Shared 6-Digit Code Generator</h1>
-  <p class="lead">All users share one synced history (Supabase backend).</p>
+  <h1>6-Digit Code Generator</h1>
+  <p class="lead">All users share one synced history.</p>
 
   <div class="controls">
     <select id="prefix">
