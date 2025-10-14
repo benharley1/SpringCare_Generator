@@ -78,18 +78,20 @@ h1 {
   border-radius: 10px;
   padding: 10px;
   font-size: 15px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: rgba(255,255,255,0.05);
-  color: #e6eef6;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(10, 15, 35, 0.9);   /* ✅ Darker background */
+  color: #f1f4fa;                      /* ✅ Lighter text */
   height: 44px;
+  appearance: none;
 }
 
 .controls select:focus,
 .controls input:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.3);
+  box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.4);
 }
+
 
 /* ---------- Buttons ---------- */
 button {
