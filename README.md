@@ -12,12 +12,18 @@
 <style>
 :root {
   --accent: #7c5cff;
+  --accent-dark: #6046e6;
   --muted: #9aa4b2;
+  --bg: linear-gradient(180deg, #061021 0%, #071428 100%);
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial;
-  background: linear-gradient(180deg, #061021 0%, #071428 100%);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
   color: #e6eef6;
   display: flex;
   align-items: center;
@@ -29,35 +35,53 @@ body {
 
 .card {
   width: 100%;
-  max-width: 640px;
-  padding: 20px;
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-  box-shadow: 0 8px 30px rgba(2,6,23,0.6);
-  box-sizing: border-box;
+  max-width: 750px;
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+
+h1 {
+  font-size: 1.8rem;
+  text-align: center;
+  margin: 0;
+}
+
+.lead {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-top: 4px;
 }
 
 /* ---------- Controls ---------- */
 .controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
 }
 
 .controls select,
 .controls input[type="number"] {
-  flex: 1 1 45%;
-  min-width: 130px;
-  max-width: 200px;
+  width: 100%;
   border-radius: 10px;
   padding: 10px;
   font-size: 15px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
   background: rgba(255,255,255,0.05);
   color: #e6eef6;
   height: 44px;
-  box-sizing: border-box;
 }
 
 .controls select:focus,
@@ -69,7 +93,7 @@ body {
 
 /* ---------- Buttons ---------- */
 button {
-  background: linear-gradient(180deg, var(--accent), #6046e6);
+  background: linear-gradient(180deg, var(--accent), var(--accent-dark));
   color: white;
   border: 0;
   font-weight: 600;
@@ -88,42 +112,48 @@ button:hover {
 
 button.ghost {
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
   color: var(--muted);
 }
 
-/* Footer export button */
-.footer button {
-  width: 60%;
-  min-width: 140px;
-  height: 44px;
+.footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
 }
 
-/* ---------- Display & History ---------- */
+.footer button {
+  width: 50%;
+  min-width: 160px;
+}
+
+/* ---------- Display ---------- */
 .display {
-  margin-top: 20px;
   display: flex;
   justify-content: center;
 }
 
 .codebox {
   background: #051025;
-  border-radius: 10px;
-  padding: 18px;
-  font-size: 22px;
+  border-radius: 12px;
+  padding: 20px;
+  font-size: 24px;
   text-align: center;
   width: 100%;
   word-break: break-word;
+  font-family: monospace;
 }
 
+/* ---------- History ---------- */
 .history {
-  margin-top: 16px;
   max-height: 300px;
   overflow-y: auto;
   font-family: monospace;
   font-size: 14px;
-  border-top: 1px solid rgba(255,255,255,0.05);
+  border-top: 1px solid rgba(255,255,255,0.08);
   padding-top: 8px;
+  margin-top: 4px;
+  scroll-behavior: smooth;
 }
 
 .history-entry {
@@ -133,54 +163,44 @@ button.ghost {
   padding: 6px 0;
 }
 
-/* ---------- Mobile Optimization ---------- */
+.history-entry strong {
+  font-size: 15px;
+}
+
+.history-entry small {
+  color: var(--muted);
+}
+
 @media (max-width: 600px) {
-  body {
-    padding: 10px;
-  }
-
   .card {
-    padding: 16px;
-  }
-
-  .controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .controls select,
-  .controls input[type="number"],
-  .controls button {
-    flex: 1 1 100%;
-    width: 100%;
-    max-width: 100%;
-    font-size: 16px;
-  }
-
-  .footer button {
-    width: 100%;
+    padding: 18px;
+    gap: 16px;
   }
 
   h1 {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
   }
 
   .codebox {
     font-size: 20px;
   }
 
+  .footer button {
+    width: 100%;
+  }
+
   .history {
-    max-height: 200px;
+    max-height: 220px;
   }
 }
-
 </style>
 </head>
-
 <body>
 <div class="card">
-  <h1 style="text-align:center;">6-Digit Code Generator</h1>
-  <p class="lead" style="text-align:center;color:var(--muted)">All users share one synced history.</p>
+  <div>
+    <h1>6-Digit Code Generator</h1>
+    <p class="lead">All users share one synced history.</p>
+  </div>
 
   <div class="controls">
     <select id="prefix">
@@ -188,10 +208,8 @@ button.ghost {
       <option value="SY">SY</option><option value="CM">CM</option><option value="NM">NM</option>
     </select>
 
-    <!-- Quantity moved before Grade -->
     <input id="quantity" type="number" min="1" max="50" value="1">
 
-    <!-- Grade moved after Quantity -->
     <select id="grade" required>
       <option value="">Select Grade *</option>
       <option>Cook</option><option>HCA - Day</option><option>HCA - Night</option>
@@ -217,7 +235,7 @@ button.ghost {
 
   <div class="display"><div class="codebox" id="codebox">—</div></div>
 
-  <div class="footer" style="margin-top:16px;text-align:center;">
+  <div class="footer">
     <button id="exportBtn" class="ghost">Export to Excel</button>
   </div>
 
@@ -233,7 +251,7 @@ const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 /* Generator Logic */
 const M = 1000000;
 function randInt(max) { return Math.floor(Math.random() * max); }
-function gcd(a, b) { while (b) { [a, b] = [b, a % b]; } return a; }
+function gcd(a, b) { while (b) [a, b] = [b, a % b]; return a; }
 function chooseA() { while (true) { const a = 1 + randInt(M - 1); if (gcd(a, M) === 1) return a; } }
 function fmt6(n) { return n.toString().padStart(6, "0"); }
 let a = chooseA(), b = randInt(M), c = randInt(M);
