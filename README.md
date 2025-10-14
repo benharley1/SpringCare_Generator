@@ -110,11 +110,16 @@ button.ghost {
   <p class="lead">All users share one synced history (Supabase backend).</p>
 
   <div class="controls">
-    <input id="prefix" type="text" placeholder="Prefix (e.g. INV-)" value="CODE-">
+    <select id="prefix">
+  <option value="LR">LR</option>
+  <option value="ML">ML</option>
+  <option value="SY">SY</option>
+  <option value="CM">CM</option>
+  <option value="NM">NM</option>
+    </select>
     <select id="padChar">
       <option value="">(none)</option>
       <option value="-">-</option>
-      <option value="_">_</option>
     </select>
     <input id="quantity" type="number" min="1" max="50" value="1">
     <button id="genBtn">Generate</button>
