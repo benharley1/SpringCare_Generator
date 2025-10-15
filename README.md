@@ -2,7 +2,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>6-Digit Code Generator (Supabase)</title>
+<title>Agency Code Generator (Supabase)</title>
 
 <!-- Supabase SDK -->
 <script src="https://unpkg.com/@supabase/supabase-js@2.46.1/dist/umd/supabase.js"></script>
@@ -200,7 +200,7 @@ button.ghost {
 <body>
 <div class="card">
   <div>
-    <h1>6-Digit Code Generator</h1>
+    <h1>Agency Code Generator</h1>
     <p class="lead">All users share one synced history.</p>
   </div>
 
