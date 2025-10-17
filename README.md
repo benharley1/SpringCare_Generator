@@ -79,8 +79,8 @@ h1 {
   padding: 10px;
   font-size: 15px;
   border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(10, 15, 35, 0.9);   /* ✅ Darker background */
-  color: #f1f4fa;                      /* ✅ Lighter text */
+  background: rgba(10, 15, 35, 0.9);
+  color: #f1f4fa;
   height: 44px;
   appearance: none;
 }
@@ -91,7 +91,6 @@ h1 {
   border-color: var(--accent);
   box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.4);
 }
-
 
 /* ---------- Buttons ---------- */
 button {
@@ -212,8 +211,9 @@ button.ghost {
 
     <input id="quantity" type="number" min="1" max="50" value="1">
 
-    <select id="grade" required>
-      <option value="">Select Grade *</option>
+    <!-- ✅ Grade now optional -->
+    <select id="grade">
+      <option value="">Select Grade (optional)</option>
       <option>Cook</option><option>HCA - Day</option><option>HCA - Night</option>
       <option>RGN - Day</option><option>RGN - Night</option>
       <option>SHCA - Day</option><option>SHCA - Night</option>
@@ -321,10 +321,13 @@ document.getElementById('genBtn').addEventListener('click', async () => {
   const prefix = prefixEl.value || '';
   const grade = gradeEl.value.trim();
   const home = homeEl.value.trim();
-  if (!grade || !home) {
-    alert('Please select both Grade and Home before generating.');
+
+  // ✅ Grade is now optional
+  if (!home) {
+    alert('Please select a Home before generating.');
     return;
   }
+
   let qty = parseInt(qtyEl.value) || 1;
   if (qty > 50) qty = 50;
 
