@@ -2,7 +2,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>SpringCare Agency Code Generator</title>
+<title>Agency Code Generator (Supabase)</title>
 
 <!-- Supabase SDK -->
 <script src="https://unpkg.com/@supabase/supabase-js@2.46.1/dist/umd/supabase.js"></script>
@@ -11,11 +11,10 @@
 
 <style>
 :root {
-  --spring-green: #003C2F;
-  --spring-pink: #E91E63;
-  --spring-yellow: #FFC107;
-  --muted: #8ea39c;
-  --bg: #0f1a17;
+  --accent: #7c5cff;
+  --accent-dark: #6046e6;
+  --muted: #9aa4b2;
+  --bg: #0a1020;
 }
 
 * { box-sizing: border-box; }
@@ -23,7 +22,7 @@
 body {
   font-family: "Inter", system-ui, sans-serif;
   background: var(--bg);
-  color: var(--spring-green);
+  color: #e6eef6;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -35,48 +34,33 @@ body {
 .card {
   width: 100%;
   max-width: 420px;
-  background: white;
+  background: #0e1528;
   border-radius: 12px;
   padding: 28px 26px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
   display: flex;
   flex-direction: column;
   gap: 30px;
-  border-top: 6px solid var(--spring-pink);
-}
-
-/* Header with logo */
-.logo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo img {
-  width: 300px;
-  height: auto;
 }
 
 h1 {
-  font-size: 1.9rem;
+  font-size: 1.5rem;
   text-align: center;
   margin: 0;
-  color: var(--spring-green);
-  border-bottom: 2px solid rgba(233, 30, 99, 0.5);
-  padding-bottom: 8px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(124, 92, 255, 0.8); /* thicker + accent color */
+  display: inline-block;
   width: 100%;
-  letter-spacing: 0.5px;
 }
 
 .lead {
   text-align: center;
   color: var(--muted);
   font-size: 0.9rem;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
-/* Layout */
+/* ---------- Layout ---------- */
 .controls {
   display: flex;
   flex-direction: column;
@@ -95,9 +79,9 @@ h1 {
   border-radius: 8px;
   padding: 10px;
   font-size: 15px;
-  border: 1px solid #d2d8d6;
-  background: #fafafa;
-  color: var(--spring-green);
+  border: 1px solid rgba(255,255,255,0.12);
+  background: #121b32;
+  color: #f1f4fa;
   height: 44px;
   appearance: none;
 }
@@ -105,13 +89,13 @@ h1 {
 .controls select:focus,
 .controls input:focus {
   outline: none;
-  border-color: var(--spring-pink);
-  box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.25);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(124, 92, 255, 0.3);
 }
 
-/* Buttons */
+/* ---------- Buttons ---------- */
 button {
-  background: linear-gradient(180deg, var(--spring-pink), #d81b60);
+  background: linear-gradient(180deg, var(--accent), var(--accent-dark));
   color: white;
   border: none;
   font-weight: 600;
@@ -128,22 +112,13 @@ button:hover {
   transform: translateY(-1px);
 }
 
-/* Ghost Button (Export) */
 button.ghost {
   background: transparent;
-  border: 1px solid var(--spring-green);
-  color: var(--spring-green);
-  font-weight: 400; /* less bold */
-  letter-spacing: 0.3px;
-  transition: all 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--muted);
 }
 
-button.ghost:hover {
-  background: rgba(0, 60, 47, 0.05);
-  transform: translateY(-1px);
-}
-
-/* Display */
+/* ---------- Display ---------- */
 .display {
   display: flex;
   flex-direction: column;
@@ -152,7 +127,7 @@ button.ghost:hover {
 }
 
 .codebox {
-  background: #f1f4f3;
+  background: #071020;
   border-radius: 8px;
   padding: 18px;
   font-size: 22px;
@@ -161,16 +136,15 @@ button.ghost:hover {
   word-break: break-word;
   font-family: monospace;
   min-height: 58px;
-  border: 1px solid #d5dedb;
 }
 
-/* Toast */
+/* ---------- Toast ---------- */
 .toast {
   position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%) translateY(100px);
-  background: var(--spring-green);
+  background: rgba(0,0,0,0.7);
   color: #fff;
   padding: 10px 16px;
   border-radius: 8px;
@@ -184,43 +158,42 @@ button.ghost:hover {
   transform: translateX(-50%) translateY(0);
 }
 
-/* History */
+/* ---------- History ---------- */
 .history {
   max-height: 250px;
   overflow-y: auto;
   font-family: monospace;
   font-size: 13.5px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid rgba(255,255,255,0.08);
   padding-top: 10px;
 }
 
 .history-entry {
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid #f1f1f1;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
   padding: 6px 0;
 }
 
-.history-entry strong { font-size: 15px; color: var(--spring-green); }
+.history-entry strong { font-size: 15px; }
 .history-entry small { color: var(--muted); }
 
-/* Responsive */
+/* ---------- Responsive ---------- */
 @media (max-width: 600px) {
-  .card { padding: 26px; gap: 24px; }
+  .card { padding: 20px; gap: 26px; }
   .row { grid-template-columns: 1fr; gap: 16px; }
 }
 </style>
 </head>
 <body>
 <div class="card">
-  <div class="logo">
-    <img src="Springcare Logo.png" alt="SpringCare Logo">
+  <div>
     <h1>Agency Code Generator</h1>
     <p class="lead">All users share one synced history.</p>
   </div>
 
-  <!-- Controls -->
   <div class="controls">
+    <!-- Row 1: Prefix + Quantity -->
     <div class="row">
       <select id="prefix">
         <option value="LR">LR</option>
@@ -233,6 +206,7 @@ button.ghost:hover {
       <input id="quantity" type="number" min="1" max="50" value="1">
     </div>
 
+    <!-- Row 2: Grade + Home -->
     <div class="row">
       <select id="grade">
         <option value="">Select Grade (optional)</option>
@@ -254,14 +228,19 @@ button.ghost:hover {
       </select>
     </div>
 
-    <div><button id="genBtn">Generate</button></div>
+    <!-- Generate Button (Full Width Row) -->
+    <div>
+      <button id="genBtn">Generate</button>
+    </div>
   </div>
 
   <div class="display">
     <div class="codebox" id="codebox">—</div>
   </div>
 
-  <div><button id="exportBtn" class="ghost">Export to Excel</button></div>
+  <div>
+    <button id="exportBtn" class="ghost">Export to Excel</button>
+  </div>
 
   <div class="history" id="history">Loading shared history...</div>
 </div>
@@ -269,7 +248,6 @@ button.ghost:hover {
 <div id="toast" class="toast">Copied to clipboard ✅</div>
 
 <script>
-/* Supabase logic unchanged */
 const supabaseUrl = 'https://regoucscslemhbvurekt.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJlZ291Y3Njc2xlbWhidnVyZWt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODcxNjYsImV4cCI6MjA3NTk2MzE2Nn0.TKPxKfj70S-BarDNuWrpnmLMEl55XABwhIq-DvBxvAA';
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -311,7 +289,9 @@ async function loadHistory(){
   });
 }
 
-async function insertCodes(codes){ await supabase.from('codes').insert(codes); }
+async function insertCodes(codes){
+  await supabase.from('codes').insert(codes);
+}
 
 function showToast(msg){
   toast.textContent=msg;
