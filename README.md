@@ -197,6 +197,7 @@ button.ghost {
     <div class="row">
       <select id="prefix">
         <option value="LR">LR</option>
+        <option value="AF">LR</option>
         <option value="ML">ML</option>
         <option value="SY">SY</option>
         <option value="CM">CM</option>
